@@ -161,22 +161,39 @@ class Madmimi {
 	 * @param 	string 	The new lists name
 	 * @return 	mixed	The response from madmimi
 	 */
-	public function list_create($list_name)
+	public function list_add($list_name)
 	{
 		return $this->send_request('/audience_lists', array('name'=>$list_name), TRUE, FALSE);	
 	}
 	
 	/**
-	 * Create a member
-	 *
-	 *
-	 * @return	mixed	The response from madmimi
+	 * Add a member to a list
+	 * 
+	 * @param 	string 	The new lists name
+	 * @return 	mixed	The response from madmimi
 	 */
-	public function member_create(array $member_data)
+	public function list_add_member($list_name, $email)
 	{
-		
+		return $this->send_request('/audience_lists/'.$list_name.'/add?email='.$email, array(), FALSE, FALSE);	
 	}
 	
+	/**
+	 * Add a member
+	 *
+	 * @param	array	The members data
+	 * @return	mixed	The response from madmimi
+	 */
+	public function member_add(array $member_data)
+	{
+		return $this->send_request('/audience_members', array('csv_file'=>$this->csv($member_data)), TRUE, FALSE);	
+	}
+	
+	/**
+	 * Turn an array into yaml data
+	 * 
+	 * @param 	array	Values to be turned into yaml
+	 * @return	string	Yaml formatted values
+	 */
 	private function yamlise(array $input)
 	{
 		// Find the sfYAML library
@@ -186,5 +203,33 @@ class Madmimi {
 		Kohana::load($path);
 		
 		return sfYaml::dump($input);
+	}
+	
+	/**
+	 * Turn an array into csv data
+	 * 
+	 * @param	array	Values to be turned into csv (arrays of arrays)
+	 * @return string Csv formatted values
+	 */
+	private function csv(array $input)
+	{
+		$csv_string = '';
+		
+		// Add headers
+		$headers = array_keys($input[0]);
+		array_unshift($input, $headers);
+		
+		// Create the csv string
+		foreach ($input as $row)
+		{
+			$data = array();
+			foreach ($row as $key=>$value)
+			{
+				$data[$key] = utf8_decode(str_replace('"', '""', $value));
+			}
+			$csv_string .= implode(',', $data) . "\r\n";
+		}
+		
+		return $csv_string;
 	}
 }
