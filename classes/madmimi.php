@@ -102,7 +102,7 @@ class Madmimi {
 
 
 	/**
-	 * Send a mail message 
+	 * Send a mail message. This includes plain text, html and promotion emails.
 	 * 
 	 * Example :
 	 * 		$madmimi = new Madmimi;
@@ -117,6 +117,16 @@ class Madmimi {
 	 */
 	public function mail(array $params)
 	{
+		// Check for required fields
+		if (empty($params['promotion_name']))
+		{
+			throw new Madmimi_Exception('Please include a promotion name (promotion_name).');
+		}
+		if (empty($params['recipients']))
+		{
+			throw new Madmimi_Exception('Please make sure you include a recipient');
+		}
+
 		// Check to see if we are sending html or text
 		if ( ! empty($params['raw_html']))
 		{
@@ -188,6 +198,21 @@ class Madmimi {
 		return $this->send_request('/audience_members', array('csv_file'=>$this->csv($member_data)), TRUE, FALSE);	
 	}
 	
+	/**
+	 * Get the status for a transactional email
+	 * 
+	 *		$status = $madmimi->mail_status('123456788');
+	 *
+	 * The possible statuses are found here: http://madmimi.com/developer/mailer/status
+	 *
+	 * @param	string	The transaction id to get the status for
+	 * @return	string	The status
+	 */
+	public function mail_status($transaction_id)
+	{
+		return $this->send_request('/mailers/status/'.$transaction_id, FALSE, FALSE);
+	}
+
 	/**
 	 * Turn an array into yaml data
 	 * 
