@@ -174,7 +174,7 @@ class Madmimi {
 	 */
 	public function list_add_member($list_name, $email)
 	{
-		return $this->send_request('/audience_lists/'.$list_name.'/add?email='.$email, array(), FALSE, FALSE);	
+		return $this->send_request('/audience_lists/'.$list_name.'/add?email='.$email, array(), TRUE, FALSE);	
 	}
 	
 	/**
