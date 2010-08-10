@@ -166,6 +166,28 @@ class Madmimi {
 	}
 	
 	/**
+	 * Get a list of lists
+	 * 
+	 * @param 	string 	The new lists name
+	 * @return 	mixed	The response from madmimi
+	 */
+	public function lists_get()
+	{
+		return $this->send_request('/audience_lists/lists.xml', array(), FALSE, FALSE);	
+	}
+	
+	/**
+	 * Get a list of lists that the user (email) is a member of
+	 *
+	 * @param	string	Email of user to check memberships for
+	 * @return	string	List of memberships
+	 */
+	public function list_memberships($email)
+	{
+		return $this->send_request('/audience_members/'.rawurlencode($email).'/lists.xml', array(), FALSE, FALSE);
+	}
+
+	/**
 	 * Create a new list
 	 * 
 	 * @param 	string 	The new lists name
@@ -175,17 +197,41 @@ class Madmimi {
 	{
 		return $this->send_request('/audience_lists', array('name'=>$list_name), TRUE, FALSE);	
 	}
-	
+
+	/**
+	 * Remove a list
+	 * 
+	 * @param 	string 	The lists name to remove
+	 * @return 	mixed	The response from madmimi
+	 */
+	public function list_remove($list_name)
+	{
+		return $this->send_request('/audience_lists/'.rawurlencode($list_name), array('_method'=>'delete'), TRUE, FALSE);	
+	}
+
 	/**
 	 * Add a member to a list
 	 * 
-	 * @param 	string 	The new lists name
+	 * @param 	string 	The lists name
 	 * @return 	mixed	The response from madmimi
 	 */
 	public function list_add_member($list_name, $email)
 	{
-		return $this->send_request('/audience_lists/'.$list_name.'/add?email='.$email, array(), TRUE, FALSE);	
+		return $this->send_request('/audience_lists/'.rawurlencode($list_name).'/add?email='.rawurlencode($email), array(), TRUE, FALSE);	
 	}
+	
+	/**
+	 * Remove a member from a list
+	 *
+	 * @param	string	The lists name
+	 * @param	string	The email of the member to remove
+	 * @return	mixed	The response from madmimi
+	 */
+	public function list_remove_member($list_name, $email)
+	{
+		return $this->send_request('/audience_lists/'.rawurlencode($list_name).'/remove', array('email'=>$email), TRUE, FALSE);	
+	}
+
 	
 	/**
 	 * Add a member
@@ -197,7 +243,7 @@ class Madmimi {
 	{
 		return $this->send_request('/audience_members', array('csv_file'=>$this->csv($member_data)), TRUE, FALSE);	
 	}
-	
+
 	/**
 	 * Get the status for a transactional email
 	 * 
@@ -210,7 +256,7 @@ class Madmimi {
 	 */
 	public function mail_status($transaction_id)
 	{
-		return $this->send_request('/mailers/status/'.$transaction_id, FALSE, FALSE);
+		return $this->send_request('/mailers/status/'.rawurlencode($transaction_id), FALSE, FALSE);
 	}
 
 	/**
